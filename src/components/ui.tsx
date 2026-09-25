@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight } from '@phosphor-icons/react/ssr'
-import { PortableText, type PortableTextBlock } from 'next-sanity'
+import { PortableText, type PortableTextBlock, type PortableTextComponents } from 'next-sanity'
+import { CopyEmail } from './CopyEmail'
+import { newTabProps } from './nav'
 
 export const container = 'mx-auto w-full max-w-7xl px-5 md:px-8'
 export const display = 'font-display font-medium tracking-tight'
@@ -10,7 +12,7 @@ type ButtonProps = { href: string; children: React.ReactNode; variant?: 'primary
 /** Pill button. External links (tickets, mail, phone) get the diagonal arrow and open safely. */
 export function ButtonLink({ href, children, variant = 'primary' }: ButtonProps) {
   const external = /^(https?:|mailto:|tel:)/.test(href)
-  const newTab = href.startsWith('http')
+  const newTab = 'target' in newTabProps(href)
   const Icon = newTab ? ArrowUpRight : ArrowRight
   const className = `group inline-flex min-h-13 items-center gap-3 whitespace-nowrap rounded-full py-2 pr-2 pl-6 text-base font-medium transition duration-300 ease-stage active:scale-[0.98] ${
     variant === 'primary'
@@ -27,7 +29,7 @@ export function ButtonLink({ href, children, variant = 'primary' }: ButtonProps)
     </>
   )
   return external ? (
-    <a href={href} className={className} {...(newTab && { target: '_blank', rel: 'noopener noreferrer' })}>
+    <a href={href} className={className} {...newTabProps(href)}>
       {inner}
     </a>
   ) : (
@@ -37,11 +39,24 @@ export function ButtonLink({ href, children, variant = 'primary' }: ButtonProps)
   )
 }
 
+const richComponents: PortableTextComponents = {
+  marks: {
+    link: ({ value, children }) =>
+      value?.href?.startsWith('mailto:') ? (
+        <CopyEmail email={value.href.slice(7).split('?')[0]}>{children}</CopyEmail>
+      ) : (
+        <a href={value?.href} {...newTabProps(value?.href ?? '')}>
+          {children}
+        </a>
+      ),
+  },
+}
+
 export function Rich({ value }: { value?: PortableTextBlock[] | null }) {
   if (!value?.length) return null
   return (
     <div className="prose-stage">
-      <PortableText value={value} />
+      <PortableText value={value} components={richComponents} />
     </div>
   )
 }

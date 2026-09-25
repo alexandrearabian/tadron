@@ -14,5 +14,9 @@ export const theatreNav = [
 
 export const contactNav = { href: '/contacto', label: 'Contacto' }
 
+/** Web links open in a new tab. Email (mailto:) and phone links must not: the browser hands them
+ * to the visitor's mail/phone app, which opens a new message ready to send. */
+export const newTabProps = (href: string) => (/^https?:/.test(href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})
+
 export const mapsHref = (address: string) =>
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`

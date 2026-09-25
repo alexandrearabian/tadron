@@ -1,5 +1,6 @@
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
+import { Toaster } from '@/components/Toast'
 import { getSettings } from '@/lib/content'
 
 // Public site chrome. /studio sits outside this group so Sanity Studio stays full-screen.
@@ -18,6 +19,7 @@ export default async function SiteLayout({ children }: LayoutProps<'/'>) {
         {children}
       </main>
       <Footer settings={settings} />
+      <Toaster />
       <div aria-hidden className="grain" />
     </>
   )

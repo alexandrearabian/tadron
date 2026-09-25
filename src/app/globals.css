@@ -65,9 +65,10 @@ p {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Inside the menu the icon rests as an × */
-.menu .burger-line:first-child { transform: translateY(6px) rotate(45deg); }
-.menu .burger-line:last-child { transform: translateY(-6px) rotate(-45deg); }
+/* Inside the menu the icon rests as an × (the middle line hides) */
+.menu .burger-line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.menu .burger-line:nth-child(2) { transform: scaleX(0); opacity: 0; }
+.menu .burger-line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 /* Rich text coming from Sanity (Portable Text) */
 .prose-stage {
@@ -109,12 +110,12 @@ p {
 @keyframes fade-away {
   to { opacity: 0; }
 }
-/* Menu icon: two lines that cross into an × inside the open menu */
+/* Menu icon: three lines that turn into an × inside the open menu */
 @keyframes burger-in {
-  from { transform: none; }
+  from { transform: none; opacity: 1; }
 }
 @keyframes burger-out {
-  to { transform: none; }
+  to { transform: none; opacity: 1; }
 }
 @keyframes progress {
   from { transform: scaleX(0); }
@@ -145,12 +146,20 @@ p {
     animation: burger-out 0.25s var(--ease-exit) forwards;
   }
 
+  /* Toast: rises in, and its bar shrinks over the 3s it stays (Toast.tsx DURATION) */
+  .toast {
+    animation: rise 0.4s var(--ease-stage) both;
+  }
+  .toast-timer {
+    animation: progress 3s linear reverse both;
+  }
+
   /* Home carousel: the timer bar drives autoplay (see HeroCarousel), the photo drifts slowly */
   .hero-progress {
-    animation: progress 7s linear both;
+    animation: progress 4.5s linear both;
   }
   .hero-drift {
-    animation: drift 9s var(--ease-stage) both;
+    animation: drift 6s var(--ease-stage) both;
   }
 
   @supports (animation-timeline: view()) {

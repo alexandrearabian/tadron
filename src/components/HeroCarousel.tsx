@@ -12,14 +12,14 @@ const roundButton =
 
 /**
  * Home hero: one slide per bookable show. Autoplay is the active timer bar's CSS animation
- * (.hero-progress, 7s): when it ends we advance. Hover, keyboard focus and the pause button pause it,
- * and with reduced motion the bar doesn't animate, so there is no autoplay at all.
+ * (.hero-progress, 4.5s): when it ends we advance. It only stops while someone presses and holds
+ * (mouse button or finger) or with the pause button; with reduced motion there is no autoplay at all.
  */
 export function HeroCarousel({ slides }: { slides: Slide[] }) {
   const [index, setIndex] = useState(0)
   const [loaded, setLoaded] = useState(() => new Set([0, 1 % slides.length])) // current + next image only
   const [paused, setPaused] = useState(false)
-  const [held, setHeld] = useState(false) // pointer over it or focus inside
+  const [held, setHeld] = useState(false) // mouse button or finger held down on it
   const [touchX, setTouchX] = useState<number | null>(null)
   const many = slides.length > 1
   const stopped = paused || held
@@ -36,10 +36,10 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
       aria-roledescription="carrusel"
       aria-label="Obras en cartel"
       className="relative isolate flex min-h-[100dvh] items-end overflow-hidden"
-      onMouseEnter={() => setHeld(true)}
-      onMouseLeave={() => setHeld(false)}
-      onFocus={() => setHeld(true)}
-      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setHeld(false)}
+      onPointerDown={() => setHeld(true)}
+      onPointerUp={() => setHeld(false)}
+      onPointerCancel={() => setHeld(false)}
+      onPointerLeave={() => setHeld(false)}
       onTouchStart={(e) => setTouchX(e.touches[0].clientX)}
       onTouchEnd={(e) => {
         const dx = touchX === null ? 0 : e.changedTouches[0].clientX - touchX

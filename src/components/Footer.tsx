@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { FacebookLogo, InstagramLogo, YoutubeLogo } from '@phosphor-icons/react/ssr'
 import type { Settings } from '@/lib/content'
 import { telHref } from '@/lib/content'
+import { CopyEmail } from './CopyEmail'
 import { container } from './ui'
 import { contactNav, mapsHref, programNav, theatreNav } from './nav'
 
@@ -33,9 +34,7 @@ export function Footer({ settings }: { settings: Settings }) {
               </a>
             )}
             {email && (
-              <a href={`mailto:${email}`} className={link}>
-                {email}
-              </a>
+              <CopyEmail email={email} className={`text-left ${link}`} />
             )}
           </address>
         </div>

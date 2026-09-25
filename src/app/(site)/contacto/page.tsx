@@ -1,10 +1,14 @@
 import type { Metadata } from 'next'
-import { EnvelopeSimple, MapPin, Phone } from '@phosphor-icons/react/ssr'
-import { mapsHref } from '@/components/nav'
+import { Copy, EnvelopeSimple, MapPin, Phone } from '@phosphor-icons/react/ssr'
+import { CopyEmail } from '@/components/CopyEmail'
+import { mapsHref, newTabProps } from '@/components/nav'
 import { ButtonLink, container, PageTitle } from '@/components/ui'
 import { getSettings, telHref } from '@/lib/content'
 
 export const metadata: Metadata = { title: 'Contacto' }
+
+const linkClass =
+  'mt-1 block text-2xl break-words underline decoration-paper/25 underline-offset-8 transition-colors hover:text-ember hover:decoration-ember'
 
 export default async function Contacto() {
   const { address, phone, email, mapEmbedUrl } = await getSettings()
@@ -28,13 +32,17 @@ export default async function Contacto() {
                 </span>
                 <div>
                   <p className="text-base text-mist">{label}</p>
-                  <a
-                    href={href}
-                    {...(href.startsWith('http') && { target: '_blank', rel: 'noopener noreferrer' })}
-                    className="mt-1 block text-2xl break-words underline decoration-paper/25 underline-offset-8 transition-colors hover:text-ember hover:decoration-ember"
-                  >
-                    {value}
-                  </a>
+                  {href.startsWith('mailto:') ? (
+                    <CopyEmail email={value} className={`${linkClass} inline-flex items-center gap-3`}>
+                      {value}
+                      <Copy size={22} aria-hidden className="shrink-0 text-mist" />
+                      <span className="sr-only">(copiar)</span>
+                    </CopyEmail>
+                  ) : (
+                    <a href={href} {...newTabProps(href)} className={linkClass}>
+                      {value}
+                    </a>
+                  )}
                 </div>
               </li>
             ))}

@@ -6,7 +6,7 @@ import { useRef } from 'react'
 import { contactNav, programNav, theatreNav } from './nav'
 
 // Same size and spot in the bar and inside the menu, so opening swaps them seamlessly.
-// Inside the open menu the two lines turn into an × (globals.css, .burger-line).
+// Inside the open menu the three lines turn into an × (globals.css, .burger-line).
 const iconButton =
   'grid size-12 place-items-center rounded-full ring-1 ring-paper/25 ring-inset transition-[background-color,box-shadow] duration-300 ease-stage hover:bg-paper/5 hover:ring-paper/60'
 
@@ -14,6 +14,7 @@ function MenuIcon() {
   return (
     <span aria-hidden className="relative block h-3.5 w-6">
       <span className="burger-line absolute inset-x-0 top-0 h-0.5 rounded-full bg-current" />
+      <span className="burger-line absolute inset-x-0 top-1.5 h-0.5 rounded-full bg-current" />
       <span className="burger-line absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-current" />
     </span>
   )
