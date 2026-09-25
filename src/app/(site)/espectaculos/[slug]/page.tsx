@@ -4,11 +4,21 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from '@phosphor-icons/react/ssr'
 import { Photo } from '@/components/Photo'
 import { container, display, Rich, TicketAction } from '@/components/ui'
-import { formatDay, formatTime, getProduction, upcoming } from '@/lib/content'
+import { formatDay, formatTime, getProduction, shareImage, upcoming } from '@/lib/content'
 
 export async function generateMetadata({ params }: PageProps<'/espectaculos/[slug]'>): Promise<Metadata> {
   const production = await getProduction((await params).slug)
-  return { title: production?.title }
+  if (!production) return {}
+  const byline = [production.author && `De ${production.author}`, production.director && `Dirección de ${production.director}`].filter(Boolean).join('. ')
+  return {
+    title: production.title,
+    ...(byline && { description: byline }),
+    openGraph: {
+      siteName: 'Tadrón Teatro',
+      title: production.title,
+      images: [shareImage((production.gallery?.[0] ?? production.poster).url)],
+    },
+  }
 }
 
 export default async function Obra({ params }: PageProps<'/espectaculos/[slug]'>) {

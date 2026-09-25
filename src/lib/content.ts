@@ -62,6 +62,7 @@ export type Settings = {
   youtube?: string | null
   mapEmbedUrl?: string | null
   description?: string | null
+  ogImage?: string | null
 }
 
 const IMG = `{ "url": asset->url, alt, "lqip": asset->metadata.lqip }`
@@ -84,7 +85,7 @@ const PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == $slug][0] {
 const HOME_QUERY = defineQuery(`*[_id == "homePage"][0] { ${SECTIONS} }`)
 
 const SETTINGS_QUERY = defineQuery(`*[_id == "siteSettings"][0] {
-  address, phone, email, instagram, facebook, youtube, mapEmbedUrl, description
+  address, phone, email, instagram, facebook, youtube, mapEmbedUrl, description, "ogImage": ogImage.asset->url
 }`)
 
 // ponytail: time-based revalidation; switch to on-demand (Sanity webhook + revalidateTag) if 60s lag matters
@@ -189,5 +190,8 @@ export function dateParts(iso: string) {
 
 /** "Lunes, miércoles" from each group's "Lunes de 19 a 21 h" */
 export const courseDays = (c: Course) => [...new Set(c.groups?.map((g) => g.schedule.split(' ')[0]))].join(', ')
+
+/** Share-preview (Open Graph) version of a Sanity image: 1200×630 JPEG, cropped around the busiest area. */
+export const shareImage = (url: string) => `${url}?w=1200&h=630&fit=crop&crop=entropy&fm=jpg`
 
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`

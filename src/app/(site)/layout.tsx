@@ -1,7 +1,20 @@
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
 import { Toaster } from '@/components/Toast'
-import { getSettings } from '@/lib/content'
+import type { Metadata } from 'next'
+import { getHome, getSettings, shareImage } from '@/lib/content'
+
+// Link previews (WhatsApp, Facebook…): "Imagen para redes sociales" from Ajustes del sitio,
+// or the first photo on the home page if that's empty. Show pages set their own image.
+export async function generateMetadata(): Promise<Metadata> {
+  const [settings, home] = await Promise.all([getSettings(), getHome()])
+  const homePhoto = home.sections?.flatMap((s) => (s._type === 'textWithImage' && s.image ? [s.image.url] : []))[0]
+  const image = settings.ogImage ?? homePhoto
+  return {
+    ...(settings.description && { description: settings.description }),
+    openGraph: { siteName: 'Tadrón Teatro', locale: 'es_AR', type: 'website', ...(image && { images: [shareImage(image)] }) },
+  }
+}
 
 // Public site chrome. /studio sits outside this group so Sanity Studio stays full-screen.
 export default async function SiteLayout({ children }: LayoutProps<'/'>) {
