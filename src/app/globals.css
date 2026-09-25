@@ -1,26 +1,167 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* One theme: the site is a dark "stage". One accent: crimson.
+   Shape rule: interactive elements are pills, images/media are square-cornered. */
+@theme {
+  --color-ink: #0f0d0d;
+  --color-ink-2: #171313;
+  --color-ink-3: #211b1b;
+  --color-paper: #f4f1ee;
+  --color-mist: #aea6a2;
+  --color-crimson: #b01e2d;
+  --color-crimson-deep: #8a1622;
+  --color-ember: #e4606a;
+
+  --font-sans: var(--font-geist);
+  --font-display: var(--font-cormorant);
+
+  --ease-stage: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+  /* keep the scrollbar's space when the menu locks scrolling, so the page doesn't jump sideways */
+  scrollbar-gutter: stable;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html:has(dialog[open]) {
+  overflow: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+::selection {
+  background: var(--color-crimson);
+  color: var(--color-paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ember);
+  outline-offset: 3px;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Film grain on a fixed layer, never on scrolling content */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 40;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Inside the menu the icon rests as an × */
+.menu .burger-line:first-child { transform: translateY(6px) rotate(45deg); }
+.menu .burger-line:last-child { transform: translateY(-6px) rotate(-45deg); }
+
+/* Rich text coming from Sanity (Portable Text) */
+.prose-stage {
+  display: grid;
+  gap: 1.1em;
+  max-width: 65ch;
+  color: var(--color-mist);
+  line-height: 1.75;
+}
+.prose-stage :where(h2, h3) {
+  font-family: var(--font-display);
+  color: var(--color-paper);
+  font-weight: 500;
+  line-height: 1.15;
+  margin-top: 0.6em;
+}
+.prose-stage h2 { font-size: 2rem; }
+.prose-stage h3 { font-size: 1.6rem; }
+.prose-stage strong { color: var(--color-paper); font-weight: 600; }
+.prose-stage a { color: var(--color-ember); text-decoration: underline; text-underline-offset: 4px; }
+.prose-stage :where(ul, ol) { padding-left: 1.25em; display: grid; gap: 0.4em; }
+.prose-stage ul { list-style: disc; }
+.prose-stage ol { list-style: decimal; }
+.prose-stage blockquote {
+  border-left: 2px solid var(--color-crimson);
+  padding-left: 1.25em;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-paper);
+}
+
+/* Motion: gentle, and only when the visitor allows it */
+@keyframes rise {
+  from { opacity: 0; transform: translateY(28px); }
+}
+@keyframes fade {
+  from { opacity: 0; }
+}
+@keyframes fade-away {
+  to { opacity: 0; }
+}
+/* Menu icon: two lines that cross into an × inside the open menu */
+@keyframes burger-in {
+  from { transform: none; }
+}
+@keyframes burger-out {
+  to { transform: none; }
+}
+@keyframes progress {
+  from { transform: scaleX(0); }
+}
+@keyframes drift {
+  from { transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 1s var(--ease-stage) both;
+    animation-delay: calc(var(--d, 0) * 120ms + 100ms);
+  }
+  .fade-in {
+    animation: fade 1.6s var(--ease-stage) both;
+  }
+  /* Menu: a short fade in and out, while the icon morphs. Header waits for these before dialog.close(). */
+  .menu[open] {
+    animation: fade 0.25s var(--ease-stage) both;
+  }
+  .menu[open] .burger-line {
+    animation: burger-in 0.4s var(--ease-stage) 0.05s backwards;
+  }
+  .menu[data-closing] {
+    animation: fade-away 0.25s var(--ease-exit) both;
+  }
+  .menu[data-closing] .burger-line {
+    animation: burger-out 0.25s var(--ease-exit) forwards;
+  }
+
+  /* Home carousel: the timer bar drives autoplay (see HeroCarousel), the photo drifts slowly */
+  .hero-progress {
+    animation: progress 7s linear both;
+  }
+  .hero-drift {
+    animation: drift 9s var(--ease-stage) both;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 45%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
 }
