@@ -63,6 +63,7 @@ export type Settings = {
   mapEmbedUrl?: string | null
   description?: string | null
   ogImage?: string | null
+  facade?: Img | null
 }
 
 const IMG = `{ "url": asset->url, alt, "lqip": asset->metadata.lqip }`
@@ -85,7 +86,7 @@ const PAGE_QUERY = defineQuery(`*[_type == "page" && slug.current == $slug][0] {
 const HOME_QUERY = defineQuery(`*[_id == "homePage"][0] { ${SECTIONS} }`)
 
 const SETTINGS_QUERY = defineQuery(`*[_id == "siteSettings"][0] {
-  address, phone, email, instagram, facebook, youtube, mapEmbedUrl, description, "ogImage": ogImage.asset->url
+  address, phone, email, instagram, facebook, youtube, mapEmbedUrl, description, "ogImage": ogImage.asset->url, "facade": facade${IMG}
 }`)
 
 // ponytail: time-based revalidation; switch to on-demand (Sanity webhook + revalidateTag) if 60s lag matters
@@ -182,10 +183,36 @@ export const formatTime = (iso: string) =>
 
 /** { day: "3", month: "oct", weekday: "sáb" } for compact date tiles */
 export function dateParts(iso: string) {
-  const parts = new Intl.DateTimeFormat('es-AR', { weekday: 'short', day: 'numeric', month: 'short', timeZone: TZ })
+  const parts = new Intl.DateTimeFormat('es-AR', { weekday: 'short', day: 'numeric', month: 'short', timeZone: iso.length === 10 ? 'UTC' : TZ })
     .formatToParts(new Date(iso))
   const get = (type: string) => parts.find((p) => p.type === type)?.value.replace('.', '') ?? ''
   return { day: get('day'), month: get('month'), weekday: get('weekday') }
+}
+
+/** "De Leonor Vila. Dirección de Leonor Vila" */
+export const byline = (p: Pick<Production, 'author' | 'director'>) =>
+  [p.author && `De ${p.author}`, p.director && `Dirección de ${p.director}`].filter(Boolean).join('. ')
+
+/** "21:00" (no " h"), for compact spots like ticket stubs */
+export const formatClock = (iso: string) => formatTime(iso).replace(' h', '')
+
+/** Buenos Aires calendar day of an ISO date-time: "2026-09-26" */
+export const dayKey = (iso: string | number) => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date(iso))
+
+/** The next n calendar days in Buenos Aires, starting today: ["2026-09-26", …] */
+export function nextDays(n: number, now = Date.now()) {
+  const start = Date.parse(`${dayKey(now)}T00:00:00Z`)
+  return Array.from({ length: n }, (_, i) => new Date(start + i * 86_400_000).toISOString().slice(0, 10))
+}
+
+/** Label for a show's state: its "Aviso" (e.g. "Estreno en noviembre"), or "Últimas funciones"
+ * when its run ends within two weeks. Sold-out nights are marked on each date instead. */
+export function stampFor(p: Production, now = Date.now()) {
+  if (p.announcement) return p.announcement
+  const end = p.weekly?.day != null ? p.weekly.until : p.performances?.map((d) => d.dateTime).sort().at(-1)
+  if (!end) return null
+  const left = new Date(end.length === 10 ? `${end}T23:59:59-03:00` : end).getTime() - now
+  return left > 0 && left < 14 * 86_400_000 ? 'Últimas funciones' : null
 }
 
 /** "Lunes, miércoles" from each group's "Lunes de 19 a 21 h" */

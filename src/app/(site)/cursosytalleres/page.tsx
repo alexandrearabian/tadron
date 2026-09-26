@@ -14,13 +14,13 @@ export default async function Cursos() {
     <>
       <PageTitle
         title="Cursos y talleres"
-        intro="Clases de actuación, dramaturgia y escenografía para adultos y adolescentes. Con o sin experiencia."
+        intro="Escuela de improvisación y un proyecto teatral anual, con distintos días y horarios. Con o sin experiencia."
       />
 
       {courses.length === 0 ? (
         <p className={`${container} pb-32 text-xl text-mist`}>Estamos armando los cursos del próximo cuatrimestre. Escribinos para recibir novedades.</p>
       ) : (
-        <ul className={`${container} grid gap-x-12 gap-y-20 pb-24 md:grid-cols-2 md:pb-32`}>
+        <ul className={`${container} grid gap-x-12 gap-y-14 pb-16 md:grid-cols-2 md:gap-y-20 md:pb-28`}>
           {courses.map((c, i) => (
             // Every second card drops down on desktop for a staggered, editorial rhythm
             <li key={c.slug} className={`reveal ${i % 2 ? 'md:mt-28' : ''}`}>
@@ -35,7 +35,7 @@ export default async function Cursos() {
                     />
                   )}
                 </div>
-                <h2 className={`${display} mt-7 text-4xl leading-[1.05] transition-colors group-hover:text-ember md:text-5xl`}>{c.title}</h2>
+                <h2 className={`${display} mt-7 text-display-2 transition-colors group-hover:text-ember`}>{c.title}</h2>
               </Link>
               <ul className="mt-5 grid gap-2 text-lg text-mist">
                 {c.groups?.map((g) => (

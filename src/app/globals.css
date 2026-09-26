@@ -12,8 +12,17 @@
   --color-crimson-deep: #8a1622;
   --color-ember: #e4606a;
 
-  --font-sans: var(--font-geist);
-  --font-display: var(--font-cormorant);
+  --font-sans: var(--font-barlow);
+  --font-display: var(--font-barlow-condensed);
+  --font-brand: var(--font-marvel);
+
+  /* Fluid type scale: sized for phones first, grows smoothly with the screen */
+  --text-display-1: clamp(2.75rem, 1.8rem + 4.6vw, 6.25rem);
+  --text-display-1--line-height: 0.95;
+  --text-display-2: clamp(2.25rem, 1.7rem + 2.6vw, 4.25rem);
+  --text-display-2--line-height: 1;
+  --text-display-3: clamp(1.625rem, 1.35rem + 1.2vw, 2.375rem);
+  --text-display-3--line-height: 1.1;
 
   --ease-stage: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
@@ -24,6 +33,7 @@ html {
   color-scheme: dark;
   /* keep the scrollbar's space when the menu locks scrolling, so the page doesn't jump sideways */
   scrollbar-gutter: stable;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html:has(dialog[open]) {
@@ -33,6 +43,8 @@ html:has(dialog[open]) {
 body {
   background: var(--color-ink);
   color: var(--color-paper);
+  /* safety net: nothing may ever cause sideways scrolling (clip keeps sticky elements working) */
+  overflow-x: clip;
 }
 
 ::selection {
@@ -65,10 +77,52 @@ p {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* Rings only for keyboard users: mouse clicks and taps never show an outline */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
 /* Inside the menu the icon rests as an × (the middle line hides) */
-.menu .burger-line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.menu .burger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
 .menu .burger-line:nth-child(2) { transform: scaleX(0); opacity: 0; }
-.menu .burger-line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.menu .burger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Stage light over hero photos: a soft spotlight, dark edges, and a dark base for the text */
+.spotlight {
+  background:
+    linear-gradient(to top, var(--color-ink) 0%, rgb(15 13 13 / 0.7) 30%, transparent 65%),
+    radial-gradient(ellipse 85% 75% at 62% 38%, transparent 0%, rgb(15 13 13 / 0.35) 55%, rgb(15 13 13 / 0.85) 100%);
+}
+
+/* Ticket stub: round notches cut into both sides (a mask, so any background shows through) */
+.stub {
+  --notch: 7px;
+  mask:
+    radial-gradient(circle var(--notch) at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
+}
+
+/* Rubber stamp: Agotado, Últimas funciones, Estreno… */
+.stamp {
+  display: inline-block;
+  padding: 0.3em 0.7em 0.2em;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--color-ember);
+  transform: rotate(-2deg);
+}
+
+/* Poster that morphs into the show page (React <ViewTransition share="morph">) */
+::view-transition-group(.morph) {
+  animation-duration: 450ms;
+  animation-timing-function: var(--ease-stage);
+}
 
 /* Rich text coming from Sanity (Portable Text) */
 .prose-stage {
@@ -81,7 +135,7 @@ p {
 .prose-stage :where(h2, h3) {
   font-family: var(--font-display);
   color: var(--color-paper);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.15;
   margin-top: 0.6em;
 }
@@ -173,4 +227,7 @@ p {
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) { animation: none !important; }
 }

@@ -8,13 +8,14 @@ import { contactNav, programNav, theatreNav } from './nav'
 // Same size and spot in the bar and inside the menu, so opening swaps them seamlessly.
 // Inside the open menu the three lines turn into an × (globals.css, .burger-line).
 const iconButton =
-  'grid size-12 place-items-center rounded-full ring-1 ring-paper/25 ring-inset transition-[background-color,box-shadow] duration-300 ease-stage hover:bg-paper/5 hover:ring-paper/60'
+  'group -mr-2 grid size-12 place-items-center rounded-full transition-colors duration-300 ease-stage hover:bg-paper/8 active:bg-paper/12'
 
+// Three lines, the middle one shorter (it stretches on hover)
 function MenuIcon() {
   return (
-    <span aria-hidden className="relative block h-3.5 w-6">
+    <span aria-hidden className="relative block h-4 w-7">
       <span className="burger-line absolute inset-x-0 top-0 h-0.5 rounded-full bg-current" />
-      <span className="burger-line absolute inset-x-0 top-1.5 h-0.5 rounded-full bg-current" />
+      <span className="burger-line absolute top-[7px] right-0 h-0.5 w-3/5 rounded-full bg-current transition-[width] duration-300 ease-stage group-hover:w-full" />
       <span className="burger-line absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-current" />
     </span>
   )
@@ -22,8 +23,9 @@ function MenuIcon() {
 
 function Wordmark({ onClick }: { onClick?: () => void }) {
   return (
-    <Link href="/" onClick={onClick} className="font-display text-[1.75rem] leading-none font-semibold tracking-tight">
-      Tadrón <em className="font-medium text-ember">Teatro</em>
+    <Link href="/" onClick={onClick} aria-label="Tadrón Teatro, inicio" className="font-brand flex items-baseline gap-2 leading-none">
+      <span className="text-[1.875rem] font-bold tracking-wide">TADRÓN</span>
+      <span className="text-[0.95rem] tracking-[0.25em] text-ember">TEATRO</span>
     </Link>
   )
 }
@@ -86,7 +88,7 @@ export function Header({ address, phone }: { address?: string | null; phone?: st
           e.preventDefault() // Esc: animate out like the Cerrar button
           close()
         }}
-        className="menu m-0 h-dvh max-h-none w-full max-w-none bg-ink p-0 text-paper backdrop:bg-transparent"
+        className="menu m-0 h-dvh max-h-none w-full max-w-none bg-ink p-0 text-paper outline-none backdrop:bg-transparent"
       >
         <div className="mx-auto flex min-h-full w-full max-w-7xl flex-col px-5 md:px-8">
           <div className="flex h-18 shrink-0 items-center justify-between">
@@ -96,7 +98,7 @@ export function Header({ address, phone }: { address?: string | null; phone?: st
             </button>
           </div>
 
-          <nav aria-label="Todas las secciones" className="grid flex-1 content-center gap-12 py-12 md:grid-cols-2 md:gap-16">
+          <nav aria-label="Todas las secciones" className="grid flex-1 content-center gap-10 py-10 md:grid-cols-2 md:gap-16 md:py-12">
             {menuGroups.map((group) => (
               <div key={group.title}>
                 <p className="mb-5 text-base text-mist">{group.title}</p>
@@ -107,7 +109,7 @@ export function Header({ address, phone }: { address?: string | null; phone?: st
                         href={href}
                         onClick={close}
                         aria-current={current(href)}
-                        className="font-display text-4xl leading-tight font-medium transition-colors hover:text-ember aria-[current=page]:text-ember md:text-5xl"
+                        className="font-display text-4xl leading-tight font-semibold transition-colors hover:text-ember aria-[current=page]:text-ember md:text-5xl"
                       >
                         {label}
                       </Link>

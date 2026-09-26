@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createClient } from 'next-sanity'
 
-process.loadEnvFile('.env.local')
+for (const f of ['.env.local', '.env']) if (existsSync(f)) process.loadEnvFile(f)
 const DRY = process.argv.includes('--dry-run')
 
 const EMAIL = 'tadronteatro@hotmail.com'

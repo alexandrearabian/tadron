@@ -7,6 +7,7 @@
  * so it can be re-run. Re-running overwrites unpublished Studio edits to those drafts.
  * Images come from Firebase Storage or, failing that, the --images folder; any not found are left empty and listed.
  */
+import { existsSync } from 'node:fs'
 import { applicationDefault, initializeApp } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
 import { getStorage } from 'firebase-admin/storage'
@@ -19,7 +20,7 @@ import { basename, join } from 'node:path'
 const fail = (e: unknown) => (console.error(`Error: ${(e as Error)?.message ?? e}`), process.exit(1))
 process.on('uncaughtException', fail).on('unhandledRejection', fail)
 
-process.loadEnvFile('.env.local')
+for (const f of ['.env.local', '.env']) if (existsSync(f)) process.loadEnvFile(f)
 const DRY = process.argv.includes('--dry-run')
 const EMAIL = 'tadronteatro@hotmail.com'
 

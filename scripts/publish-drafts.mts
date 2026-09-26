@@ -5,9 +5,10 @@
  *
  * The API skips the Studio's validation, so drafts missing what the site needs are left unpublished and listed.
  */
+import { existsSync } from 'node:fs'
 import { createClient } from 'next-sanity'
 
-process.loadEnvFile('.env.local')
+for (const f of ['.env.local', '.env']) if (existsSync(f)) process.loadEnvFile(f)
 const DRY = process.argv.includes('--dry-run')
 const sanity = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,

@@ -1,19 +1,15 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Geist } from "next/font/google";
+import { Barlow, Barlow_Condensed, Marvel } from "next/font/google";
 import "./globals.css";
 
-const geist = Geist({
-  variable: "--font-geist",
-  subsets: ["latin"],
-});
+// Body: Barlow, large x-height, easy to read at length
+const barlow = Barlow({ variable: "--font-barlow", subsets: ["latin"], weight: ["400", "500", "600"] });
 
-// Display serif: theatre playbill tradition, used for headings only
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
-  subsets: ["latin"],
-  weight: ["500", "600"],
-  style: ["normal", "italic"],
-});
+// Headings: its condensed sibling, the playbill look of Tadrón's flyers
+const barlowCondensed = Barlow_Condensed({ variable: "--font-barlow-condensed", subsets: ["latin"], weight: ["500", "600", "700"] });
+
+// Brand accents (wordmark, dates, stamps): Marvel, the font from Tadrón's own design files
+const marvel = Marvel({ variable: "--font-marvel", subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata: Metadata = {
   title: { default: "Tadrón Teatro", template: "%s · Tadrón Teatro" },
@@ -32,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es-AR" className={`${geist.variable} ${cormorant.variable} h-full antialiased`}>
+    <html lang="es-AR" data-scroll-behavior="smooth" className={`${barlow.variable} ${barlowCondensed.variable} ${marvel.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );

@@ -3,16 +3,18 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft } from '@phosphor-icons/react/ssr'
 import { Photo } from '@/components/Photo'
-import { container, display, Rich, TicketAction } from '@/components/ui'
-import { formatDay, formatTime, getProduction, shareImage, upcoming } from '@/lib/content'
+import { ButtonLink, container, display, Rich } from '@/components/ui'
+import { ViewTransition } from 'react'
+import { DateStub } from '@/components/stubs'
+import { byline, formatClock, getProduction, shareImage, stampFor, upcoming } from '@/lib/content'
 
 export async function generateMetadata({ params }: PageProps<'/espectaculos/[slug]'>): Promise<Metadata> {
   const production = await getProduction((await params).slug)
   if (!production) return {}
-  const byline = [production.author && `De ${production.author}`, production.director && `Dirección de ${production.director}`].filter(Boolean).join('. ')
+  const credits = byline(production)
   return {
     title: production.title,
-    ...(byline && { description: byline }),
+    ...(credits && { description: credits }),
     openGraph: {
       siteName: 'Tadrón Teatro',
       title: production.title,
@@ -26,61 +28,63 @@ export default async function Obra({ params }: PageProps<'/espectaculos/[slug]'>
   if (!production) notFound()
   const dates = upcoming([production])
   const credits = production.credits?.filter((c) => c.role && c.name) ?? []
+  const stamp = stampFor(production)
+  const bookable = production.ticketUrl && (!dates.length || dates.some((d) => !d.soldOut))
 
   return (
-    <article className={`${container} pt-28 pb-24 md:pt-32 md:pb-32`}>
+    <article className={`${container} pt-24 pb-16 md:pt-32 md:pb-28`}>
       <Link href="/espectaculos" className="inline-flex min-h-12 items-center gap-2 text-lg text-mist transition-colors hover:text-paper">
         <ArrowLeft size={20} aria-hidden />
         Volver a la cartelera
       </Link>
 
-      <div className="mt-8 grid gap-12 md:grid-cols-12 md:gap-16">
+      <div className="mt-6 grid gap-10 md:mt-8 md:grid-cols-12 md:gap-16">
         <div className="md:col-span-5">
-          <div className="fade-in relative aspect-[2/3] md:sticky md:top-28">
-            <Photo image={production.poster} fill priority sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
-          </div>
+          <ViewTransition name={`poster-${production.slug}`} share="morph" default="none">
+            <div className="relative mx-auto aspect-[2/3] max-w-sm md:sticky md:top-28 md:max-w-none">
+              <Photo image={production.poster} fill priority sizes="(min-width: 768px) 40vw, 100vw" className="object-cover" />
+            </div>
+          </ViewTransition>
         </div>
 
         <div className="md:col-span-7">
-          <h1 className={`${display} rise text-5xl leading-[0.98] md:text-7xl`}>{production.title}</h1>
-          <p className="rise mt-5 text-xl text-mist" style={{ '--d': 1 } as React.CSSProperties}>
-            {[production.author && `De ${production.author}`, production.director && `Dirección de ${production.director}`]
-              .filter(Boolean)
-              .join('. ')}
+          {stamp && <span className="stamp mb-5">{stamp}</span>}
+          <h1 className={`${display} rise text-display-1`}>{production.title}</h1>
+          <p className="rise mt-4 text-lg text-mist md:text-xl" style={{ '--d': 1 } as React.CSSProperties}>
+            {byline(production)}
           </p>
-          {production.announcement && <p className="mt-4 text-xl text-ember">{production.announcement}</p>}
 
-          <div className="mt-12">
+          <div className="mt-10">
             <Rich value={production.synopsis} />
           </div>
 
-          <section aria-labelledby="funciones" className="mt-16">
-            <h2 id="funciones" className={`${display} mb-6 text-4xl`}>
+          <section aria-labelledby="funciones" className="mt-14">
+            <h2 id="funciones" className={`${display} mb-5 text-display-3`}>
               Funciones
             </h2>
             {dates.length === 0 ? (
-              <div className="grid justify-items-start gap-6">
-                <p className="text-lg text-mist">Todavía no publicamos las fechas de las funciones.</p>
-                <TicketAction url={production.ticketUrl} />
-              </div>
+              <p className="text-lg text-mist">Todavía no publicamos las fechas de las funciones.</p>
             ) : (
-              <ul className="divide-y divide-paper/10 border-y border-paper/10">
+              <ul className="flex flex-wrap gap-2.5">
                 {dates.map((d) => (
-                  <li key={d.dateTime} className="flex flex-wrap items-center justify-between gap-4 py-5">
-                    <time dateTime={d.dateTime} className="text-xl">
-                      <span className="inline-block first-letter:uppercase">{formatDay(d.dateTime)}</span>
-                      <span className="text-mist">, {formatTime(d.dateTime)}</span>
+                  <li key={d.dateTime}>
+                    <time dateTime={d.dateTime}>
+                      <DateStub iso={d.dateTime} time={formatClock(d.dateTime)} soldOut={d.soldOut} />
                     </time>
-                    <TicketAction url={production.ticketUrl} soldOut={d.soldOut} />
                   </li>
                 ))}
               </ul>
             )}
+            {bookable && (
+              <div className="mt-8">
+                <ButtonLink href={production.ticketUrl!}>Reservar entradas</ButtonLink>
+              </div>
+            )}
           </section>
 
           {credits.length > 0 && (
-            <section aria-labelledby="ficha" className="mt-16">
-              <h2 id="ficha" className={`${display} mb-6 text-4xl`}>
+            <section aria-labelledby="ficha" className="mt-14">
+              <h2 id="ficha" className={`${display} mb-5 text-display-3`}>
                 Ficha técnica
               </h2>
               <dl className="grid gap-x-10 gap-y-5 sm:grid-cols-2">
@@ -97,7 +101,7 @@ export default async function Obra({ params }: PageProps<'/espectaculos/[slug]'>
       </div>
 
       {!!production.gallery?.length && (
-        <section aria-label="Fotos" className="mt-24 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+        <section aria-label="Fotos" className="mt-16 grid md:mt-24 grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
           {production.gallery.map((image) => (
             <div key={image.url} className="reveal relative aspect-[3/2]">
               <Photo image={image} fill sizes="(min-width: 768px) 33vw, 100vw" className="object-cover" />

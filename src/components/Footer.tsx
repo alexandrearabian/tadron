@@ -16,11 +16,18 @@ export function Footer({ settings }: { settings: Settings }) {
   const link = 'transition-colors hover:text-paper'
 
   return (
-    <footer className="mt-auto border-t border-paper/10 bg-ink-2">
-      <div className={`${container} grid gap-14 py-16 md:grid-cols-12 md:py-24`}>
+    <footer className="mt-auto bg-ink-2">
+      {/* The red bar from Tadrón's flyers; the years count themselves from 1996 */}
+      <p className="font-brand bg-crimson px-5 py-3 text-center text-lg font-bold tracking-wide text-paper uppercase md:text-xl">
+        {new Date().getFullYear() - 1996} años haciendo Tadrón
+      </p>
+      <div className={`${container} grid gap-12 py-14 md:grid-cols-12 md:gap-14 md:py-20`}>
         <div className="md:col-span-5">
-          <p className="font-display text-5xl font-semibold tracking-tight">
-            Tadrón <em className="font-medium text-ember">Teatro</em>
+          {/* The flyer lockup: TADRÓN / significa / TEATRO */}
+          <p className="font-brand inline-grid justify-items-center leading-none" aria-label="Tadrón significa teatro">
+            <span aria-hidden className="text-6xl font-bold tracking-wide">TADRÓN</span>
+            <span aria-hidden className="my-1 w-full bg-crimson py-0.5 text-center text-sm tracking-[0.3em] uppercase">significa</span>
+            <span aria-hidden className="text-5xl tracking-[0.12em]">TEATRO</span>
           </p>
           <address className="mt-8 grid gap-2 text-lg not-italic text-mist">
             {address && (
@@ -34,7 +41,7 @@ export function Footer({ settings }: { settings: Settings }) {
               </a>
             )}
             {email && (
-              <CopyEmail email={email} className={`text-left ${link}`} />
+              <CopyEmail email={email} className={`text-left [overflow-wrap:anywhere] ${link}`} />
             )}
           </address>
         </div>

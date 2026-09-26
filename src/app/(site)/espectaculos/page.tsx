@@ -2,7 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Photo } from '@/components/Photo'
 import { ButtonLink, container, display, PageTitle } from '@/components/ui'
-import { formatDay, formatTime, getProductions, onStage, upcoming } from '@/lib/content'
+import { ViewTransition } from 'react'
+import { DateStub } from '@/components/stubs'
+import { byline, formatClock, getProductions, onStage, stampFor, upcoming } from '@/lib/content'
 
 export const metadata: Metadata = { title: 'Cartelera' }
 
@@ -16,49 +18,46 @@ export default async function Cartelera() {
       {productions.length === 0 ? (
         <p className={`${container} pb-32 text-xl text-mist`}>Por ahora no hay obras en cartel. Muy pronto anunciamos los próximos estrenos.</p>
       ) : (
-        <div className={`${container} pb-24 md:pb-32`}>
+        <div className={`${container} pb-16 md:pb-28`}>
           {productions.map((p) => {
             const dates = upcoming([p])
+            const stamp = stampFor(p)
             return (
-              <article key={p.slug} className="reveal grid gap-8 border-t border-paper/10 py-12 md:grid-cols-12 md:gap-12 md:py-16">
-                <Link href={`/espectaculos/${p.slug}`} className="group relative block aspect-[2/3] overflow-hidden md:col-span-4 lg:col-span-3">
-                  <Photo
-                    image={p.poster}
-                    fill
-                    sizes="(min-width: 768px) 30vw, 100vw"
-                    className="object-cover transition duration-700 ease-stage group-hover:scale-[1.03]"
-                  />
+              <article key={p.slug} className="reveal grid gap-6 border-t border-paper/10 py-10 sm:grid-cols-[12rem_1fr] sm:gap-8 md:grid-cols-12 md:gap-12 md:py-14">
+                <Link href={`/espectaculos/${p.slug}`} className="group block w-40 sm:w-auto md:col-span-4 lg:col-span-3">
+                  <ViewTransition name={`poster-${p.slug}`} share="morph" default="none">
+                    <div className="relative aspect-[2/3] overflow-hidden">
+                      <Photo
+                        image={p.poster}
+                        fill
+                        sizes="(min-width: 768px) 30vw, 12rem"
+                        className="object-cover transition duration-700 ease-stage group-hover:scale-[1.03]"
+                      />
+                    </div>
+                  </ViewTransition>
                 </Link>
-                <div className="md:col-span-8 lg:col-span-8 lg:col-start-5">
-                  <h2 className={`${display} text-4xl leading-[1.05] md:text-6xl`}>
+                <div className="min-w-0 md:col-span-8 lg:col-span-8 lg:col-start-5">
+                  {stamp && <span className="stamp mb-4">{stamp}</span>}
+                  <h2 className={`${display} text-display-2`}>
                     <Link href={`/espectaculos/${p.slug}`} className="transition-colors hover:text-ember">
                       {p.title}
                     </Link>
                   </h2>
-                  <p className="mt-4 text-xl text-mist">
-                    {[p.author && `De ${p.author}`, p.director && `Dirección de ${p.director}`].filter(Boolean).join('. ')}
-                  </p>
+                  <p className="mt-3 text-lg text-mist md:text-xl">{byline(p)}</p>
 
-                  {p.announcement && <p className="mt-6 text-xl text-ember">{p.announcement}</p>}
-
-                  <h3 className="mt-10 mb-4 text-lg font-medium">Próximas funciones</h3>
-                  {dates.length === 0 ? (
-                    <p className="text-lg text-mist">Sin funciones programadas por ahora.</p>
-                  ) : (
-                    <ul className="flex flex-wrap gap-3">
-                      {dates.slice(0, 4).map((d) => (
-                        <li
-                          key={d.dateTime}
-                          className={`rounded-full px-5 py-2.5 text-base ring-1 ring-inset ${d.soldOut ? 'text-mist ring-paper/10' : 'ring-paper/25'}`}
-                        >
-                          <span className="inline-block first-letter:uppercase">{formatDay(d.dateTime)}</span>, {formatTime(d.dateTime)}
-                          {d.soldOut && <span className="ml-2 text-ember">Agotado</span>}
+                  {dates.length > 0 && (
+                    <ul className="mt-8 flex flex-wrap gap-2.5" aria-label="Próximas funciones">
+                      {dates.slice(0, 5).map((d) => (
+                        <li key={d.dateTime}>
+                          <time dateTime={d.dateTime}>
+                            <DateStub iso={d.dateTime} time={formatClock(d.dateTime)} soldOut={d.soldOut} />
+                          </time>
                         </li>
                       ))}
                     </ul>
                   )}
 
-                  <div className="mt-10 flex flex-wrap gap-4">
+                  <div className="mt-8 flex flex-wrap gap-3 md:gap-4">
                     {p.ticketUrl && (!dates.length || dates.some((d) => !d.soldOut)) && <ButtonLink href={p.ticketUrl}>Reservar entradas</ButtonLink>}
                     <ButtonLink href={`/espectaculos/${p.slug}`} variant="outline">
                       Ver la obra

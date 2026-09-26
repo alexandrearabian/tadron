@@ -65,10 +65,9 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
             </div>
           ),
       )}
-      <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-t from-ink via-ink/55 to-ink/20" />
-      <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-ink/80 via-ink/30 to-transparent" />
+      <div aria-hidden className="spotlight absolute inset-0 -z-10" />
 
-      <div className="mx-auto w-full max-w-7xl px-5 pt-32 pb-10 md:px-8 md:pb-14">
+      <div className="mx-auto w-full max-w-7xl px-5 pt-28 pb-8 md:px-8 md:pt-32 md:pb-14">
         <div aria-live={stopped ? 'polite' : 'off'} className="grid items-end gap-12 lg:grid-cols-12">
           {/* keyed by slide so the text and poster replay their entrance */}
           <div
@@ -88,7 +87,7 @@ export function HeroCarousel({ slides }: { slides: Slide[] }) {
         </div>
 
         {many && (
-          <div className="mt-12 flex items-center gap-6 md:mt-16">
+          <div className="mt-10 flex items-center gap-4 md:mt-16 md:gap-6">
             <div className="flex flex-1 gap-1.5">
               {slides.map((s, i) => (
                 <button

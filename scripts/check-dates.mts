@@ -1,6 +1,7 @@
 // Self-check for the Cartelera date logic:  npx tsx scripts/check-dates.mts
+import { existsSync } from 'node:fs'
 import assert from 'node:assert/strict'
-process.loadEnvFile('.env.local')
+for (const f of ['.env.local', '.env']) if (existsSync(f)) process.loadEnvFile(f)
 const { onStage, upcoming } = await import('../src/lib/content')
 type P = Parameters<typeof onStage>[0][number]
 

@@ -18,15 +18,15 @@ export default async function Curso({ params }: PageProps<'/cursosytalleres/[slu
   const hasMain = !!(course.image || course.description?.length)
 
   return (
-    <article className={`${container} pt-28 pb-24 md:pt-32 md:pb-32`}>
+    <article className={`${container} pt-24 pb-16 md:pt-32 md:pb-28`}>
       <Link href="/cursosytalleres" className="inline-flex min-h-12 items-center gap-2 text-lg text-mist transition-colors hover:text-paper">
         <ArrowLeft size={20} aria-hidden />
         Volver a cursos y talleres
       </Link>
 
-      <h1 className={`${display} rise mt-8 max-w-4xl text-5xl leading-[0.98] md:text-8xl`}>{course.title}</h1>
+      <h1 className={`${display} rise mt-8 max-w-4xl text-display-1`}>{course.title}</h1>
 
-      <div className="mt-14 grid gap-12 md:grid-cols-12 md:gap-16">
+      <div className="mt-10 grid gap-10 md:mt-14 md:gap-12 md:grid-cols-12 md:gap-16">
         {hasMain && (
           <div className="md:col-span-7">
             {course.image && (

@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { imageWithAlt } from './fields'
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -20,6 +21,7 @@ export const siteSettings = defineType({
       validation: (r) => r.max(160),
     }),
     defineField({ name: 'ogImage', title: 'Imagen para redes sociales', type: 'image' }),
+    defineField({ name: 'facade', title: 'Foto de la fachada', description: 'Se muestra en Contacto', ...imageWithAlt }),
   ],
   preview: { prepare: () => ({ title: 'Ajustes del sitio' }) },
 })
