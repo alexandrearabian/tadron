@@ -6,7 +6,11 @@ import { ViewTransition } from 'react'
 import { DateStub } from '@/components/stubs'
 import { byline, formatClock, getProductions, onStage, stampFor, upcoming } from '@/lib/content'
 
-export const metadata: Metadata = { title: 'Cartelera' }
+export const metadata: Metadata = {
+  title: 'Cartelera',
+  description: 'Obras en cartel en Tadrón Teatro, sala independiente en Palermo, Buenos Aires: fechas, horarios y reserva de entradas.',
+  alternates: { canonical: '/espectaculos' },
+}
 
 export default async function Cartelera() {
   const productions = onStage(await getProductions())

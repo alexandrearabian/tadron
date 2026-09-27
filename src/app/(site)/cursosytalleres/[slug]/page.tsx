@@ -4,11 +4,17 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from '@phosphor-icons/react/ssr'
 import { Photo } from '@/components/Photo'
 import { ButtonLink, container, display, Rich } from '@/components/ui'
-import { formatDay, getCourse } from '@/lib/content'
+import { describe, formatDay, getCourse } from '@/lib/content'
 
 export async function generateMetadata({ params }: PageProps<'/cursosytalleres/[slug]'>): Promise<Metadata> {
   const course = await getCourse((await params).slug)
-  return { title: course?.title }
+  if (!course) return {}
+  const groups = course.groups?.map((g) => [g.schedule, g.teacher && `con ${g.teacher}`].filter(Boolean).join(' ')).join('; ')
+  return {
+    title: course.title,
+    description: describe(course.description) ?? describe(`${course.title} en Tadrón Teatro, Palermo. ${groups ?? ''}.`),
+    alternates: { canonical: `/cursosytalleres/${course.slug}` },
+  }
 }
 
 export default async function Curso({ params }: PageProps<'/cursosytalleres/[slug]'>) {

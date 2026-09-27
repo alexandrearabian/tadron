@@ -23,6 +23,9 @@ import {
   upcoming,
 } from '@/lib/content'
 import type { Production } from '@/lib/content'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = { alternates: { canonical: '/' } }
 
 export default async function Home() {
   const [all, courses, home] = await Promise.all([getProductions(), getCourses(), getHome()])

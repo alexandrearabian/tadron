@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { Photo } from '@/components/Photo'
 import { Sections } from '@/components/Sections'
 import { container, display } from '@/components/ui'
-import { getPage } from '@/lib/content'
+import { describe, getPage, shareImage } from '@/lib/content'
 
 // Content pages edited in Sanity ("Páginas"): tadron-es-teatro, nuestro-espacio, gaston-breyer...
 async function load(params: PageProps<'/[slug]'>['params']) {
@@ -11,7 +11,16 @@ async function load(params: PageProps<'/[slug]'>['params']) {
 }
 
 export async function generateMetadata({ params }: PageProps<'/[slug]'>): Promise<Metadata> {
-  return { title: (await load(params))?.title }
+  const page = await load(params)
+  if (!page) return {}
+  const first = page.sections?.find((s) => s._type === 'textWithImage' || s._type === 'callout')
+  const firstText = first?._type === 'textWithImage' ? first.body : first?._type === 'callout' ? first.text : undefined
+  return {
+    title: page.title,
+    ...(describe(firstText) && { description: describe(firstText) }),
+    alternates: { canonical: `/${page.slug}` },
+    ...(page.heroImage && { openGraph: { siteName: 'Tadrón Teatro', title: page.title, images: [shareImage(page.heroImage.url)] } }),
+  }
 }
 
 export default async function ContentPage({ params }: PageProps<'/[slug]'>) {

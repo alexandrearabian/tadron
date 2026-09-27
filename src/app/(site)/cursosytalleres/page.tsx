@@ -5,7 +5,11 @@ import { Photo } from '@/components/Photo'
 import { container, display, PageTitle, TextLink } from '@/components/ui'
 import { formatDay, getCourses } from '@/lib/content'
 
-export const metadata: Metadata = { title: 'Cursos y talleres' }
+export const metadata: Metadata = {
+  title: 'Cursos y talleres',
+  description: 'Cursos de teatro en Tadrón, Palermo: escuela de improvisación y proyecto teatral anual. Días, horarios, docentes e inscripción.',
+  alternates: { canonical: '/cursosytalleres' },
+}
 
 export default async function Cursos() {
   const courses = await getCourses()

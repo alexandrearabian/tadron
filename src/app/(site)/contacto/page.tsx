@@ -6,7 +6,11 @@ import { mapsHref, newTabProps } from '@/components/nav'
 import { ButtonLink, container, PageTitle } from '@/components/ui'
 import { getHome, getSettings, telHref } from '@/lib/content'
 
-export const metadata: Metadata = { title: 'Contacto' }
+export const metadata: Metadata = {
+  title: 'Contacto',
+  description: 'Dirección, teléfono y email de Tadrón Teatro, sala independiente en Palermo, Buenos Aires. Cómo llegar a la sala.',
+  alternates: { canonical: '/contacto' },
+}
 
 const linkClass =
   'mt-1 block text-xl [overflow-wrap:anywhere] md:text-2xl underline decoration-paper/25 underline-offset-8 transition-colors hover:text-ember hover:decoration-ember'

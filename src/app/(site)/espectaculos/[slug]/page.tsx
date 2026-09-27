@@ -6,7 +6,9 @@ import { Photo } from '@/components/Photo'
 import { ButtonLink, container, display, Rich } from '@/components/ui'
 import { ViewTransition } from 'react'
 import { DateStub } from '@/components/stubs'
-import { byline, formatClock, getProduction, shareImage, stampFor, upcoming } from '@/lib/content'
+import { JsonLd } from '@/components/JsonLd'
+import { byline, describe, formatClock, getProduction, getSettings, shareImage, stampFor, upcoming } from '@/lib/content'
+import { showEvents } from '@/lib/schema'
 
 export async function generateMetadata({ params }: PageProps<'/espectaculos/[slug]'>): Promise<Metadata> {
   const production = await getProduction((await params).slug)
@@ -14,7 +16,8 @@ export async function generateMetadata({ params }: PageProps<'/espectaculos/[slu
   const credits = byline(production)
   return {
     title: production.title,
-    ...(credits && { description: credits }),
+    description: describe(production.synopsis) ?? (credits ? `${production.title}. ${credits}. En Tadrón Teatro, Palermo.` : undefined),
+    alternates: { canonical: `/espectaculos/${production.slug}` },
     openGraph: {
       siteName: 'Tadrón Teatro',
       title: production.title,
@@ -24,8 +27,9 @@ export async function generateMetadata({ params }: PageProps<'/espectaculos/[slu
 }
 
 export default async function Obra({ params }: PageProps<'/espectaculos/[slug]'>) {
-  const production = await getProduction((await params).slug)
+  const [production, settings] = await Promise.all([getProduction((await params).slug), getSettings()])
   if (!production) notFound()
+  const events = showEvents(production, settings)
   const dates = upcoming([production])
   const credits = production.credits?.filter((c) => c.role && c.name) ?? []
   const stamp = stampFor(production)
@@ -33,6 +37,7 @@ export default async function Obra({ params }: PageProps<'/espectaculos/[slug]'>
 
   return (
     <article className={`${container} pt-24 pb-16 md:pt-32 md:pb-28`}>
+      {events.length > 0 && <JsonLd data={events} />}
       <Link href="/espectaculos" className="inline-flex min-h-12 items-center gap-2 text-lg text-mist transition-colors hover:text-paper">
         <ArrowLeft size={20} aria-hidden />
         Volver a la cartelera

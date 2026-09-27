@@ -1,8 +1,10 @@
 import { Footer } from '@/components/Footer'
 import { Header } from '@/components/Header'
+import { JsonLd } from '@/components/JsonLd'
 import { Toaster } from '@/components/Toast'
 import type { Metadata } from 'next'
 import { getHome, getSettings, shareImage } from '@/lib/content'
+import { theatre } from '@/lib/schema'
 
 // Link previews (WhatsApp, Facebook…): "Imagen para redes sociales" from Ajustes del sitio,
 // or the first photo on the home page if that's empty. Show pages set their own image.
@@ -18,9 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 // Public site chrome. /studio sits outside this group so Sanity Studio stays full-screen.
 export default async function SiteLayout({ children }: LayoutProps<'/'>) {
-  const settings = await getSettings()
+  const [settings, home] = await Promise.all([getSettings(), getHome()])
+  const photo = settings.facade?.url ?? home.sections?.flatMap((s) => (s._type === 'textWithImage' && s.image ? [s.image.url] : []))[0]
   return (
     <>
+      <JsonLd data={theatre(settings, photo && shareImage(photo))} />
       <a
         href="#contenido"
         className="sr-only z-50 rounded-full bg-paper px-5 py-3 text-ink focus:not-sr-only focus:fixed focus:top-4 focus:left-4"

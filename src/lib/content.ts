@@ -1,5 +1,8 @@
-import { defineQuery, type PortableTextBlock } from 'next-sanity'
+import { defineQuery, toPlainText, type PortableTextBlock } from 'next-sanity'
 import { client } from '@/sanity/lib/client'
+
+/** The site's official address (www; the bare domain redirects here). Used for canonical URLs, sitemap, structured data. */
+export const SITE_URL = 'https://www.tadronteatro.com.ar'
 
 export type Img = { url: string; alt: string; lqip?: string | null } // lqip: tiny blurred preview from Sanity
 
@@ -117,6 +120,10 @@ export async function getHome(): Promise<Home> {
   return (await fetchSanity<Home | null>(HOME_QUERY)) ?? {}
 }
 
+export async function getPageSlugs(): Promise<string[]> {
+  return fetchSanity<string[]>(defineQuery(`*[_type == "page" && defined(slug.current)].slug.current`))
+}
+
 export async function getSettings(): Promise<Settings> {
   return (await fetchSanity<Settings | null>(SETTINGS_QUERY)) ?? {}
 }
@@ -187,6 +194,13 @@ export function dateParts(iso: string) {
     .formatToParts(new Date(iso))
   const get = (type: string) => parts.find((p) => p.type === type)?.value.replace('.', '') ?? ''
   return { day: get('day'), month: get('month'), weekday: get('weekday') }
+}
+
+/** Search-result description: plain text, cut at a word, about 155 characters. */
+export function describe(text?: string | PortableTextBlock[] | null, max = 155) {
+  const plain = (typeof text === 'string' ? text : text ? toPlainText(text) : '').replace(/\s+/g, ' ').trim()
+  if (plain.length <= max) return plain || undefined
+  return plain.slice(0, plain.lastIndexOf(' ', max - 1)).replace(/[,.;:]$/, '') + '…'
 }
 
 /** "De Leonor Vila. Dirección de Leonor Vila" */

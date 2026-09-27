@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Barlow, Barlow_Condensed, Marvel } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/content";
 
 // Body: Barlow, large x-height, easy to read at length
 const barlow = Barlow({ variable: "--font-barlow", subsets: ["latin"], weight: ["400", "500", "600"] });
@@ -12,6 +13,7 @@ const barlowCondensed = Barlow_Condensed({ variable: "--font-barlow-condensed", 
 const marvel = Marvel({ variable: "--font-marvel", subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: { default: "Tadrón Teatro", template: "%s · Tadrón Teatro" },
   description: "Sala de teatro independiente en Palermo, Buenos Aires. Cartelera, cursos y talleres.",
   // Files in /public
