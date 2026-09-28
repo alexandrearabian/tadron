@@ -56,3 +56,12 @@ export function showEvents(p: Production, settings: Settings) {
       }),
     }))
 }
+
+/** Site name Google shows above the result, instead of the bare domain. Home page only. */
+export const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'Tadrón Teatro',
+  alternateName: 'Tadrón',
+  url: `${SITE_URL}/`,
+}

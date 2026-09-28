@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ViewTransition } from 'react'
 import { ArrowRight } from '@phosphor-icons/react/ssr'
 import { HeroCarousel, type Slide } from '@/components/HeroCarousel'
+import { JsonLd } from '@/components/JsonLd'
 import { Photo } from '@/components/Photo'
 import { Sections } from '@/components/Sections'
 import { ButtonLink, container, display, TextLink } from '@/components/ui'
@@ -24,6 +25,7 @@ import {
 } from '@/lib/content'
 import type { Production } from '@/lib/content'
 import type { Metadata } from 'next'
+import { website } from '@/lib/schema'
 
 export const metadata: Metadata = { alternates: { canonical: '/' } }
 
@@ -68,6 +70,7 @@ export default async function Home() {
 
   return (
     <>
+      <JsonLd data={website} />
       {slides.length > 0 && <HeroCarousel slides={slides} />}
 
       <section aria-labelledby="agenda" className={`${container} py-16 md:py-28`}>
